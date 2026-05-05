@@ -2,7 +2,7 @@
 
 import { eventBusService } from "../services/event-bus.service.js"
 
-const { useState, useEffect } = React
+import { useState, useEffect } from 'react'
 
 export function UserMsg() {
 
