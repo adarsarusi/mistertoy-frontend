@@ -3,13 +3,10 @@ import { toyService } from '../../services/toy.service.js'
 import { ADD_TOY, REMOVE_TOY, SET_TOYS, SET_IS_LOADING, UPDATE_TOY } from '../reducers/toy.reducer.js'
 // import { SET_USER_BALANCE } from '../reducers/user.reducer.js'
 
-// All toys are are stored in the store
-// Use getFilteredToys to get the filtered toys
-
-export function loadToys() {
+export function loadToys(filterBy) {
     store.dispatch({ type: SET_IS_LOADING, isLoading: true })
 
-	return toyService.query()
+	return toyService.query(filterBy)
         .then(toys => store.dispatch({ type: SET_TOYS, toys }))
         .finally(() => store.dispatch({ type: SET_IS_LOADING, isLoading: false }))
 }
@@ -44,47 +41,4 @@ export function getStats(state) {
     const stock = state.toyModule.toys.filter(toy => toy.inStock).length
 
     return { total, stock }
-}
-
-// Get toys with filtering applied
-
-export function getFilteredToys(state) {
-    const { filterBy, toys } = state.toyModule
-    let filteredToys = [...toys]
-
-    if (filterBy.name) {
-        const regExp = new RegExp(filterBy.name, 'i')
-        filteredToys = filteredToys.filter(toy => regExp.test(toy.name))
-    }
-
-    if (filterBy.inStock && filterBy.inStock !== 'all') {
-        filteredToys = filteredToys.filter(toy =>
-            filterBy.inStock === 'in' ? toy.inStock : !toy.inStock
-        )
-    }
-
-    if (filterBy.labels?.length) {
-        filteredToys = filteredToys.filter(toy =>
-            filterBy.labels.every(label => toy.labels.includes(label))
-        )
-    }
-
-    if (filterBy.sortBy) {
-            const { sortBy, sortDir } = filterBy
-
-            filteredToys.sort((a, b) => {
-                let valA = a[sortBy]
-                let valB = b[sortBy]
-
-                // string sort (name)
-                if (typeof valA === 'string') {
-                    return valA.localeCompare(valB) * sortDir
-                }
-
-                // number/date sort
-                return (valA - valB) * sortDir
-            })
-        }
-
-    return filteredToys
 }

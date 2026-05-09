@@ -1,4 +1,7 @@
-import { storageService } from "./async-storage.service.js"
+import axios from 'axios'
+
+const BASE_URL = 'http://localhost:3030/api'
+const STORAGE_KEY_LOGGEDIN = 'user'
 
 export const userService = {
     getLoggedinUser,
@@ -10,46 +13,31 @@ export const userService = {
     getEmptyCredentials,
 }
 
-const STORAGE_KEY_LOGGEDIN = 'user'
-const STORAGE_KEY = 'userDB'
-
 function query() {
-    return storageService.query(STORAGE_KEY)
+    return axios.get(BASE_URL + '/user')
+        .then(res => res.data)
 }
 
 function getById(userId) {
-    return storageService.get(STORAGE_KEY, userId)
+    return axios.get(BASE_URL + '/user/' + userId)
+        .then(res => res.data)
 }
 
-function login({ username, password }) {
-    return storageService.query(STORAGE_KEY)
-        .then(users => {
-            const user = users.find(user => user.username === username)
-            if (user) return _setLoggedinUser(user)
-            else return Promise.reject('Invalid login')
-        })
+function login(credentials) {
+    return axios.post(BASE_URL + '/auth/login', credentials)
+        .then(res => _setLoggedinUser(res.data))
 }
 
-function signup({ username, password, fullname }) {
-    const user = { username, password, fullname }
-
-    return userService.query(STORAGE_KEY)
-        .then(users => {
-            if (users.find(user => user.username === username)) {
-                return Promise.reject('username taken')
-            }
-            user.createdAt = user.updatedAt = Date.now()
-            user.balance = 100
-            // user.activities = []
-
-            return storageService.post(STORAGE_KEY, user)
-                .then(_setLoggedinUser)
-        })
+function signup(credentials) {
+    return axios.post(BASE_URL + '/auth/signup', credentials)
+        .then(res => _setLoggedinUser(res.data))
 }
 
 function logout() {
-    sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN)
-    return Promise.resolve()
+    return axios.post(BASE_URL + '/auth/logout')
+        .then(() => {
+            sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN)
+        })
 }
 
 function getLoggedinUser() {
@@ -64,19 +52,13 @@ function getEmptyCredentials() {
     }
 }
 
-// function addActivity(userId, activityType, data, credit) {
-//     return getById(userId)
-//         .then(user => {
-//             const activity = { type: activityType, at: Date.now(), ...data }
-//             user.activities.unshift(activity)
-//             user.balance += credit
-
-//             return storageService.put(STORAGE_KEY, user)
-//         })
-// }
-
 function _setLoggedinUser(user) {
-    const userToSave = { _id: user._id, fullname: user.fullname, balance: user.balance }
+    const userToSave = {
+        _id: user._id,
+        fullname: user.fullname,
+        balance: user.balance
+    }
+
     sessionStorage.setItem(STORAGE_KEY_LOGGEDIN, JSON.stringify(userToSave))
     return userToSave
 }

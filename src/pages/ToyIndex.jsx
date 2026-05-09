@@ -2,7 +2,7 @@ import { Loader } from "../cmps/Loader.jsx"
 import { ToyFilter } from "../cmps/ToyFilter.jsx"
 import { ToyList } from "../cmps/ToyList.jsx"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
-import { getFilteredToys, loadToys, removeToy, saveToy } from "../store/actions/toy.actions.js"
+import { loadToys, removeToy, saveToy } from "../store/actions/toy.actions.js"
 
 import { useEffect } from 'react' 
 import { Link, useSearchParams } from 'react-router-dom' 
@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux'
 
 export function ToyIndex() {
 
-    const toys = useSelector(getFilteredToys)
+    const toys = useSelector(state => state.toyModule.toys)
     const filterBy = useSelector(state => state.toyModule.filterBy)
     const isLoading = useSelector(state => state.toyModule.isLoading)
 
@@ -19,7 +19,7 @@ export function ToyIndex() {
 
     useEffect(() => {
         // setSearchParams(filterBy)
-        loadToys()
+        loadToys(filterBy)
             .catch(err => {
                 console.error('err:', err)
                 showErrorMsg('Cannot load toys')

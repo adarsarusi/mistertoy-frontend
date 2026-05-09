@@ -10,8 +10,8 @@ export function ToyFilter() {
 	const [filterByToEdit, setFilterByToEdit] = useState({ ...filterBy })
 
 	const debouncedApplyFilter = useRef(
-		utilService.debounce(filterBy => {
-			dispatch({ type: SET_FILTER_BY, filterBy })
+		utilService.debounce(updatedFilter => {
+			dispatch({ type: SET_FILTER_BY, filterBy: updatedFilter })
 		}, 500)
 	).current
 
