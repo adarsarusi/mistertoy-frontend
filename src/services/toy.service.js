@@ -22,18 +22,22 @@ window.cs = toyService
 function query(filterBy = {}) {
     return storageService.query(TOY_KEY)
         .then(toys => {
+
             if (filterBy.name) {
                 const regExp = new RegExp(filterBy.name, 'i')
                 toys = toys.filter(toy => regExp.test(toy.name))
             }
 
-            if (filterBy.importance) {
-                toys = toys.filter(toy => toy.importance >= filterBy.importance)
+            if (filterBy.inStock && filterBy.inStock !== 'all') {
+                toys = toys.filter(toy =>
+                    filterBy.inStock === 'in' ? toy.inStock : !toy.inStock
+                )
             }
 
-            if (filterBy.status) {
-                toys = toys.filter(toy => 
-                    filterBy.status === 'done' ? toy.isDone : !toy.isDone)
+            if (filterBy.labels?.length) {
+                toys = toys.filter(toy =>
+                    filterBy.labels.every(label => toy.labels.includes(label))
+                )
             }
 
             return toys
@@ -52,9 +56,9 @@ function remove(toyId) {
     const user = userService.getLoggedinUser()
 
     return storageService.remove(TOY_KEY, toyId)
-        // .then(() => {
-        //     if (user) userService.addActivity(user._id, 'remove', { todoId: todoId })
-        // })
+    // .then(() => {
+    //     if (user) userService.addActivity(user._id, 'remove', { todoId: todoId })
+    // })
 }
 
 function save(toy, isToggle = false) {
@@ -63,20 +67,20 @@ function save(toy, isToggle = false) {
 
     if (toy._id) {
         toy.updatedAt = Date.now()
-        
+
         return storageService.put(TOY_KEY, toy)
-            // .then(savedToy => {
-            //     if (user) userService.addActivity(user._id, 'update', { toyId: savedToy._id }, credit)
-            //     return savedToy
-            // })
+        // .then(savedToy => {
+        //     if (user) userService.addActivity(user._id, 'update', { toyId: savedToy._id }, credit)
+        //     return savedToy
+        // })
     } else {
         toy.createdAt = toy.updatedAt = Date.now()
 
         return storageService.post(TOY_KEY, toy)
-            // .then(savedToy => {
-            //     if (user) userService.addActivity(user._id, 'add', { toyId: savedToy._id }, credit)
-            //     return savedToy
-            // })
+        // .then(savedToy => {
+        //     if (user) userService.addActivity(user._id, 'add', { toyId: savedToy._id }, credit)
+        //     return savedToy
+        // })
     }
 }
 
@@ -85,7 +89,7 @@ function getEmptyToy(name = '', imgUrl = emptyToyImg) {
 }
 
 function getDefaultFilter() {
-    return { name: '', price: 0, labels: [], inStock: undefined }
+    return { name: '', inStock: 'all', labels: [], sortBy: 'name', sortDir: 1 }
 }
 
 function getFilterFromSearchParams(searchParams) {

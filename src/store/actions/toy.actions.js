@@ -49,22 +49,42 @@ export function getStats(state) {
 // Get toys with filtering applied
 
 export function getFilteredToys(state) {
-    const filterBy = state.toyModule.filterBy
-    let toys = [...state.toyModule.toys]
+    const { filterBy, toys } = state.toyModule
+    let filteredToys = [...toys]
 
-    if (filterBy.txt) {
-        const regExp = new RegExp(filterBy.txt, 'i')
-        toys = toys.filter(toy => regExp.test(toy.txt))
+    if (filterBy.name) {
+        const regExp = new RegExp(filterBy.name, 'i')
+        filteredToys = filteredToys.filter(toy => regExp.test(toy.name))
     }
 
-    if (filterBy.importance) {
-        toys = toys.filter(toy => toy.importance >= filterBy.importance)
+    if (filterBy.inStock && filterBy.inStock !== 'all') {
+        filteredToys = filteredToys.filter(toy =>
+            filterBy.inStock === 'in' ? toy.inStock : !toy.inStock
+        )
     }
 
-    if (filterBy.status) {
-        toys = toys.filter(toy => 
-            filterBy.status === 'done' ? toy.isDone : !toy.isDone)
+    if (filterBy.labels?.length) {
+        filteredToys = filteredToys.filter(toy =>
+            filterBy.labels.every(label => toy.labels.includes(label))
+        )
     }
 
-    return toys
+    if (filterBy.sortBy) {
+            const { sortBy, sortDir } = filterBy
+
+            filteredToys.sort((a, b) => {
+                let valA = a[sortBy]
+                let valB = b[sortBy]
+
+                // string sort (name)
+                if (typeof valA === 'string') {
+                    return valA.localeCompare(valB) * sortDir
+                }
+
+                // number/date sort
+                return (valA - valB) * sortDir
+            })
+        }
+
+    return filteredToys
 }
