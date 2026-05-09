@@ -3,7 +3,7 @@ import { storageService } from './async-storage.service.js'
 import { userService } from './user.service.js'
 
 const TOY_KEY = 'toyDB'
-const emptyToyURL = 'https://static.wikia.nocookie.net/charactercommunity/images/2/28/Buzz-Lightyear-PNG-File.png/revision/latest?cb=20210602160422'
+const emptyToyImg = 'src/assets/Buzz-Lightyear-PNG-File.webp'
 
 _createToys()
 
@@ -72,7 +72,7 @@ function save(toy, isToggle = false) {
     } else {
         toy.createdAt = toy.updatedAt = Date.now()
 
-        return storageService.post(toy_KEY, toy)
+        return storageService.post(TOY_KEY, toy)
             // .then(savedToy => {
             //     if (user) userService.addActivity(user._id, 'add', { toyId: savedToy._id }, credit)
             //     return savedToy
@@ -80,7 +80,7 @@ function save(toy, isToggle = false) {
     }
 }
 
-function getEmptyToy(name = '', imgUrl = emptyToyURL) {
+function getEmptyToy(name = '', imgUrl = emptyToyImg) {
     return { name, imgUrl, price: 123, labels: [], inStock: true }
 }
 
@@ -113,7 +113,7 @@ function _createToys() {
         const names = ['Buzz Buzz Buzz 🎵', 'Definately not Buzz', 'Absolutely not Buzz', 'Woody']
         for (let i = 0; i < 10; i++) {
             const name = names[utilService.getRandomIntInclusive(0, names.length - 1)]
-            toys.push(_createToy(name + (i + 1), utilService.getRandomIntInclusive(1, 10)))
+            toys.push(_createToy(name + (i + 1)))
         }
         utilService.saveToStorage(TOY_KEY, toys)
     }

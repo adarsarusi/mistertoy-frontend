@@ -1,0 +1,11 @@
+footer {
+    margin-block-start: 20px;
+    padding-block-end: 20px;
+    display: flex;
+    justify-content: center;
+    background-color: var(--clr1);
+}
+
+.app-footer{
+    color: var(--gray2);
+}

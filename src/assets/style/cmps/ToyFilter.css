@@ -1,0 +1,17 @@
+.toy-filter {
+    background-color: var(--clr2bg);
+    padding: 1em;
+    margin: 1em 0;
+}
+
+.toy-filter form {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+}
+
+.toy-index header{
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+}
