@@ -2,7 +2,7 @@ import { ToggleButton } from "../cmps/ToggleButton.jsx"
 
 import { useState } from 'react'
 
-const toyImg = 'src/assets/Buzz-Lightyear-PNG-File.webp'
+const toyImg = '/Buzz-Lightyear-PNG-File.webp'
 
 export function Home() {
     

@@ -1,7 +1,7 @@
 import { toyService } from "../services/toy.service.js"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
 
-import { useState, useEffect } from 'react' 
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 export function ToyEdit() {
@@ -14,11 +14,21 @@ export function ToyEdit() {
         if (params.toyId) loadToy()
     }, [])
 
-    function loadToy() {
-        toyService.get(params.toyId)
-            .then(setToyToEdit)
-            .catch(err => console.log('err:', err))
+    async function loadToy() {
+        try {
+            const toy = await toyService.get(params.toyId)
+            setToyToEdit(toy)
+        } catch (err) {
+            console.log(err)
+            showErrorMsg('Cannot load toy')
+        }
     }
+
+    // function loadToy() {
+    //     toyService.get(params.toyId)
+    //         .then(setToyToEdit)
+    //         .catch(err => console.log('err:', err))
+    // }
 
     function handleChange({ target }) {
         const field = target.name
@@ -41,18 +51,30 @@ export function ToyEdit() {
         setToyToEdit(prevToyToEdit => ({ ...prevToyToEdit, [field]: value }))
     }
 
-    function onSaveToy(ev) {
+    async function onSaveToy(ev) {
         ev.preventDefault()
-        toyService.save(toyToEdit)
-            .then((savedToy) => {
-                navigate('/toy')
-                showSuccessMsg(`Toy Saved (id: ${savedToy._id})`)
-            })
-            .catch(err => {
-                showErrorMsg('Cannot save toy')
-                console.log('err:', err)
-            })
+        try {
+            const savedToy = await toyService.save(toyToEdit)
+            navigate('/toy')
+            showSuccessMsg(`Toy Saved (id: ${savedToy._id})`)
+        } catch (err) {
+            showErrorMsg('Cannot save toy')
+            console.log('err:', err)
+        }
     }
+
+    // function onSaveToy(ev) {
+    //     ev.preventDefault()
+    //     toyService.save(toyToEdit)
+    //         .then((savedToy) => {
+    //             navigate('/toy')
+    //             showSuccessMsg(`Toy Saved (id: ${savedToy._id})`)
+    //         })
+    //         .catch(err => {
+    //             showErrorMsg('Cannot save toy')
+    //             console.log('err:', err)
+    //         })
+    // }
 
     const { name, price, inStock } = toyToEdit
 
@@ -66,7 +88,7 @@ export function ToyEdit() {
                 <input onChange={handleChange} value={price} type="number" name="price" id="price" />
 
                 <label htmlFor="inStock">inStock:</label>
-                <input onChange={handleChange} value={inStock} type="checkbox" name="inStock" id="inStock" />
+                <input onChange={handleChange} checked={inStock} type="checkbox" name="inStock" id="inStock" />
 
 
                 <button>Save</button>

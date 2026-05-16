@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom' 
+import { useNavigate } from 'react-router-dom'
 
 import { showErrorMsg, showSuccessMsg } from '../services/event-bus.service.js'
 import { userService } from '../services/user.service.js'
@@ -20,19 +20,41 @@ export function LoginSignup() {
         isSignup ? onSignup(credentials) : onLogin(credentials)
     }
 
-    function onLogin(credentials) {
-        login(credentials)
-            .then(() => { showSuccessMsg('Logged in successfully') })
-            .then(() => { navigate('/todo') })
-            .catch((err) => { showErrorMsg('Oops try again') })
+    async function onLogin(credentials) {
+        try {
+            await login(credentials)
+            showSuccessMsg('Logged in successfully')
+            navigate('/toy')
+        } catch (err) {
+            console.log(err)
+            showErrorMsg('Oops try again')
+        }
     }
 
-    function onSignup(credentials) {
-        signup(credentials)
-            .then(() => { showSuccessMsg('Signed in successfully') })
-            .then(() => { navigate('/todo') })
-            .catch((err) => { showErrorMsg(err) })
+    // function onLogin(credentials) {
+    //     login(credentials)
+    //         .then(() => { showSuccessMsg('Logged in successfully') })
+    //         .then(() => { navigate('/toy') })
+    //         .catch((err) => { showErrorMsg('Oops try again') })
+    // }
+
+    async function onSignup(credentials) {
+        try {
+            await signup(credentials)
+            showSuccessMsg('Signed in successfully')
+            navigate('/toy')
+        } catch (err) {
+            console.log(err)
+            showErrorMsg('Failed to sign up')
+        }
     }
+
+    // function onSignup(credentials) {
+    //     signup(credentials)
+    //         .then(() => { showSuccessMsg('Signed in successfully') })
+    //         .then(() => { navigate('/toy') })
+    //         .catch((err) => { showErrorMsg(err) })
+    // }
 
     function toggleSignup(ev) {
         ev.preventDefault()

@@ -3,36 +3,82 @@ import { toyService } from '../../services/toy.service.js'
 import { ADD_TOY, REMOVE_TOY, SET_TOYS, SET_IS_LOADING, UPDATE_TOY } from '../reducers/toy.reducer.js'
 // import { SET_USER_BALANCE } from '../reducers/user.reducer.js'
 
-export function loadToys(filterBy) {
+export async function loadToys(filterBy) {
     store.dispatch({ type: SET_IS_LOADING, isLoading: true })
 
-	return toyService.query(filterBy)
-        .then(toys => store.dispatch({ type: SET_TOYS, toys }))
-        .finally(() => store.dispatch({ type: SET_IS_LOADING, isLoading: false }))
-}
+    try {
+        const toys = await toyService.query(filterBy)
+        store.dispatch({ type: SET_TOYS, toys })
+    } catch (err) {
+        console.error('Cannot load toys', err)
+        throw err
+    }
+    finally {
+        store.dispatch({ type: SET_IS_LOADING, isLoading: false })
+    }
 
-export function removeToy(toyId) {
+}
+// export function loadToys(filterBy) {
+//     store.dispatch({ type: SET_IS_LOADING, isLoading: true })
+
+// 	return toyService.query(filterBy)
+//         .then(toys => store.dispatch({ type: SET_TOYS, toys }))
+//         .finally(() => store.dispatch({ type: SET_IS_LOADING, isLoading: false }))
+// }
+
+export async function removeToy(toyId) {
     store.dispatch({ type: SET_IS_LOADING, isLoading: true })
 
-    return toyService.remove(toyId)
-        .then(() => store.dispatch({ type: REMOVE_TOY, toyId }))
-        .finally(() => store.dispatch({ type: SET_IS_LOADING, isLoading: false }))
-}
+    try {
+        await toyService.remove(toyId)
+        store.dispatch({ type: REMOVE_TOY, toyId })
+    } catch (err) {
+        console.error(`Cannot remove toy: ${toyId}`, err)
+        throw err
+    }
+    finally {
+        store.dispatch({ type: SET_IS_LOADING, isLoading: false })
+    }
 
-export function saveToy(toy, isToggle = false) {
+}
+// export function removeToy(toyId) {
+//     store.dispatch({ type: SET_IS_LOADING, isLoading: true })
+
+//     return toyService.remove(toyId)
+//         .then(() => store.dispatch({ type: REMOVE_TOY, toyId }))
+//         .finally(() => store.dispatch({ type: SET_IS_LOADING, isLoading: false }))
+// }
+
+export async function saveToy(toy) {
     store.dispatch({ type: SET_IS_LOADING, isLoading: true })
     const type = toy._id ? UPDATE_TOY : ADD_TOY
 
-    return toyService.save(toy, isToggle)
-        .then(savedToy => {
-            store.dispatch({ type, toy: savedToy })
-            // if (isToggle && toy.isDone) {
-            //     store.dispatch({ type: SET_USER_BALANCE })
-            // }
-            return savedToy
-        })
-        .finally(() => store.dispatch({ type: SET_IS_LOADING, isLoading: false }))
+    try {
+        const savedToy = await toyService.save(toy)
+        store.dispatch({ type, toy: savedToy })
+        return savedToy
+    } catch (err) {
+        console.error(`Couldn't save toy: ${savedToy._id}`)
+        throw err
+    } finally {
+        store.dispatch({ type: SET_IS_LOADING, isLoading: false })
+    }
 }
+
+// export function saveToy(toy, isToggle = false) {
+//     store.dispatch({ type: SET_IS_LOADING, isLoading: true })
+//     const type = toy._id ? UPDATE_TOY : ADD_TOY
+
+//     return toyService.save(toy, isToggle)
+//         .then(savedToy => {
+//             store.dispatch({ type, toy: savedToy })
+//             // if (isToggle && toy.isDone) {
+//             //     store.dispatch({ type: SET_USER_BALANCE })
+//             // }
+//             return savedToy
+//         })
+//         .finally(() => store.dispatch({ type: SET_IS_LOADING, isLoading: false }))
+// }
 
 // Stats are calculated based on all toys
 

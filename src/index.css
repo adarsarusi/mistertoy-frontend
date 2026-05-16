@@ -10,6 +10,7 @@
 
 /* Components */
 @import "/src/assets/style/cmps/AppHeader.css";
+@import "/src/assets/style/cmps/Home.css";
 @import "/src/assets/style/cmps/UserMsg.css";
 @import "/src/assets/style/cmps/ToggleButton.css";
 @import "/src/assets/style/cmps/ToyFilter.css";

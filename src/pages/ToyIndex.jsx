@@ -2,11 +2,11 @@ import { Loader } from "../cmps/Loader.jsx"
 import { ToyFilter } from "../cmps/ToyFilter.jsx"
 import { ToyList } from "../cmps/ToyList.jsx"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
-import { loadToys, removeToy, saveToy } from "../store/actions/toy.actions.js"
+import { loadToys, removeToy } from "../store/actions/toy.actions.js"
 
-import { useEffect } from 'react' 
-import { Link, useSearchParams } from 'react-router-dom' 
-import { useSelector } from 'react-redux' 
+import { useEffect } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 export function ToyIndex() {
 
@@ -26,28 +26,28 @@ export function ToyIndex() {
             })
     }, [filterBy])
 
-    function onRemoveToy(toyId) {
+    async function onRemoveToy(toyId) {
         if (!confirm('Are you sure?')) return
-        
-        removeToy(toyId)
-            .then(() => {
-                showSuccessMsg(`Toy removed`)
-            })
-            .catch(err => {
-                console.log('err:', err)
-                showErrorMsg('Cannot remove toy ' + toyId)
-            })
+
+        try {
+            await removeToy(toyId)
+            showSuccessMsg(`Toy removed`)
+        } catch (err) {
+            console.log('err:', err)
+            showErrorMsg('Cannot remove toy ' + toyId)
+        }
     }
 
-    // function onToggleToy(toy) {
-    //     const toyToSave = { ...toy, inStock: !toy.inStock }
-    //     saveToy(toyToSave, true)
-    //         .then(savedToy => {
-    //             showSuccessMsg(`Todo is ${(savedTodo.inStock)? 'done' : 'back in stock'}`)
+    // function onRemoveToy(toyId) {
+    //     if (!confirm('Are you sure?')) return
+
+    //     removeToy(toyId)
+    //         .then(() => {
+    //             showSuccessMsg(`Toy removed`)
     //         })
     //         .catch(err => {
     //             console.log('err:', err)
-    //             showErrorMsg('Cannot toggle todo ' + toyId)
+    //             showErrorMsg('Cannot remove toy ' + toyId)
     //         })
     // }
 
@@ -58,11 +58,11 @@ export function ToyIndex() {
                 <ToyFilter />
                 <Link to="/toy/edit" className="btn" >Add Toy</Link>
             </header>
-            {isLoading ? 
-                <Loader /> : 
-                <ToyList 
-                    toys={toys} 
-                    onRemoveToy={onRemoveToy}/>}
+            {isLoading ?
+                <Loader /> :
+                <ToyList
+                    toys={toys}
+                    onRemoveToy={onRemoveToy} />}
         </section>
     )
 }

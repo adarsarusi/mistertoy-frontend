@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate} from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { userService } from '../services/user.service.js'
@@ -13,22 +13,36 @@ export function AppHeader() {
     const navigate = useNavigate()
     const loggedinUser = useSelector(state => state.userModule.loggedinUser)
     const dispatch = useDispatch()
-    
-    function onLogout() {
-        userService.logout()
-            .then(() => {
-                onSetUser(null)
-                navigate('/auth')
-            })
-            .catch((err) => {
-                showErrorMsg('OOPs try again')
-            })
+
+    async function onLogout() {
+
+        try {
+            await userService.logout()
+            onSetUser(null)
+            navigate('/auth')
+        } catch (err) {
+            console.log(err)
+            showErrorMsg('OOPs try again')
+        }
+
     }
+
+    // function onLogout() {
+    //     userService.logout()
+    //         .then(() => {
+    //             onSetUser(null)
+    //             navigate('/auth')
+    //         })
+    //         .catch((err) => {
+    //             showErrorMsg('OOPs try again')
+    //         })
+    // }
 
     function onSetUser(user) {
         dispatch({ type: SET_USER, user })
         navigate('/')
     }
+
     return (
         <header className="app-header full main-layout">
             <section className="header-container">
@@ -39,7 +53,7 @@ export function AppHeader() {
                     <NavLink to="/about" >About</NavLink>
                     <NavLink to="/toy" >Toys</NavLink>
                     <span> - </span>
-                    {loggedinUser ?  
+                    {loggedinUser ?
                         <section className="user-info">
                             <Link to={`/user/${loggedinUser._id}`}>{loggedinUser.fullname} {loggedinUser.balance}</Link>
                             <button onClick={onLogout}>Logout</button>
