@@ -1,6 +1,5 @@
-import axios from 'axios'
+import { httpService } from './http.service.js'
 
-const BASE_URL = 'http://localhost:3030/api/toy'
 const emptyToyImg = '/Buzz-Lightyear-PNG-File.webp'
 
 export const toyService = {
@@ -19,13 +18,29 @@ async function query(filterBy = {}) {
         inStock: filterBy.inStock || 'all',
         labels: filterBy.labels?.join(',') || '',
         sortBy: filterBy.sortBy || 'name',
-        sortDir: filterBy.sortDir || 1
+        sortDir: filterBy.sortDir || 1,
     }
 
-    const res = await axios.get(BASE_URL, { params })
-    return res.data
+    return await httpService.get('toy', params)
 }
-// function query(filterBy = {}) {
+
+async function get(toyId) {
+    return await httpService.get(`toy/${toyId}`)
+}
+
+async function remove(toyId) {
+    return await httpService.delete(`toy/${toyId}`)
+}
+
+async function save(toy) {
+    if (toy._id) {
+        return await httpService.put(`toy/${toy._id}`, toy)
+    } else {
+        return await httpService.post('toy', toy)
+    }
+}
+
+// async function query(filterBy = {}) {
 //     const params = {
 //         name: filterBy.name || '',
 //         inStock: filterBy.inStock || 'all',
@@ -34,44 +49,27 @@ async function query(filterBy = {}) {
 //         sortDir: filterBy.sortDir || 1
 //     }
 
-//     return axios.get(BASE_URL, { params })
-//         .then(res => res.data)
+//     const res = await axios.get(BASE_URL, { params })
+//     return res.data
 // }
 
-async function get(toyId) {
-    const res = await axios.get(`${BASE_URL}/${toyId}`)
-    return res.data
-}
-// function get(toyId) {
-//     return axios.get(`${BASE_URL}/${toyId}`)
-//         .then(res => res.data)
+// async function get(toyId) {
+//     const res = await axios.get(`${BASE_URL}/${toyId}`)
+//     return res.data
 // }
 
-async function remove(toyId) {
-    const res = await axios.delete(`${BASE_URL}/${toyId}`)
-    return res.data
-}
-// function remove(toyId) {
-//     return axios.delete(`${BASE_URL}/${toyId}`)
-//         .then(res => res.data)
+// async function remove(toyId) {
+//     const res = await axios.delete(`${BASE_URL}/${toyId}`)
+//     return res.data
 // }
 
-async function save(toy) {
-    if (toy._id) {
-        const res = await axios.put(`${BASE_URL}/${toy._id}`, toy)
-        return res.data
-    } else {
-        const res = await axios.post(BASE_URL, toy)
-        return res.data
-    }
-}
-// function save(toy) {
+// async function save(toy) {
 //     if (toy._id) {
-//         return axios.put(`${BASE_URL}/${toy._id}`, toy)
-//             .then(res => res.data)
+//         const res = await axios.put(`${BASE_URL}/${toy._id}`, toy)
+//         return res.data
 //     } else {
-//         return axios.post(BASE_URL, toy)
-//             .then(res => res.data)
+//         const res = await axios.post(BASE_URL, toy)
+//         return res.data
 //     }
 // }
 

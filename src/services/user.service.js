@@ -1,6 +1,5 @@
-import axios from 'axios'
+import { httpService } from './http.service.js'
 
-const BASE_URL = 'http://localhost:3030/api'
 const STORAGE_KEY_LOGGEDIN = 'user'
 
 export const userService = {
@@ -14,51 +13,60 @@ export const userService = {
 }
 
 async function query() {
-    const res = await axios.get(BASE_URL + '/user')
-    return res.data
+    return await httpService.get('user')
 }
-// function query() {
-//     return axios.get(BASE_URL + '/user')
-//         .then(res => res.data)
-// }
 
 async function getById(userId) {
-    const res = await axios.get(BASE_URL + '/user/' + userId)
-    return res.data
+    return await httpService.get(`user/${userId}`)
 }
-// function getById(userId) {
-//     return axios.get(BASE_URL + '/user/' + userId)
-//         .then(res => res.data)
-// }
 
 async function login(credentials) {
-    const res = await axios.post(BASE_URL + '/auth/login', credentials)
-    return _setLoggedinUser(res.data)
-}
+    const user = await httpService.post(
+        'auth/login',
+        credentials
+    )
 
-// function login(credentials) {
-//     return axios.post(BASE_URL + '/auth/login', credentials)
-//         .then(res => _setLoggedinUser(res.data))
-// }
+    return _setLoggedinUser(user)
+}
 
 async function signup(credentials) {
-    const res = await axios.post(BASE_URL + '/auth/signup', credentials)
-    return _setLoggedinUser(res.data)
+    const user = await httpService.post(
+        'auth/signup',
+        credentials
+    )
+
+    return _setLoggedinUser(user)
 }
-// function signup(credentials) {
-//     return axios.post(BASE_URL + '/auth/signup', credentials)
-//         .then(res => _setLoggedinUser(res.data))
-// }
 
 async function logout() {
-    await axios.post(BASE_URL + '/auth/logout')
+    await httpService.post('auth/logout')
+
     sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN)
 }
-// function logout() {
-//     return axios.post(BASE_URL + '/auth/logout')
-//         .then(() => {
-//             sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN)
-//         })
+
+// async function query() {
+//     const res = await axios.get(BASE_URL + '/user')
+//     return res.data
+// }
+
+// async function getById(userId) {
+//     const res = await axios.get(BASE_URL + '/user/' + userId)
+//     return res.data
+// }
+
+// async function login(credentials) {
+//     const res = await axios.post(BASE_URL + '/auth/login', credentials)
+//     return _setLoggedinUser(res.data)
+// }
+
+// async function signup(credentials) {
+//     const res = await axios.post(BASE_URL + '/auth/signup', credentials)
+//     return _setLoggedinUser(res.data)
+// }
+
+// async function logout() {
+//     await axios.post(BASE_URL + '/auth/logout')
+//     sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN)
 // }
 
 function getLoggedinUser() {
